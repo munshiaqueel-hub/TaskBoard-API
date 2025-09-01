@@ -5,6 +5,7 @@ using TaskBoard.Api.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using TaskBoard.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

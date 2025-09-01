@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Api.Models;
 using TaskBoard.Api.Services;
 
+namespace TaskBoard.Extensions;
 public static class TasksExtensions
 {
     public static IEndpointRouteBuilder MapTaskEndpoints(this IEndpointRouteBuilder app)

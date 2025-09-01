@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Api.Models;
 
@@ -57,8 +56,8 @@ public class EfTaskRepository : ITaskRepository
 
     public async Task<IReadOnlyList<BoardTask>> GetByColumnAsync(Guid columnId, CancellationToken ct)
     {
-        var list = _db.Tasks.Where(t => t.ColumnId == columnId).ToList();
-        return await Task.FromResult<IReadOnlyList<BoardTask>>(list);
+        var list = await _db.Tasks.Include(t => t.Images).Where(t => t.ColumnId == columnId).ToListAsync();
+        return list;
     }
 
 }

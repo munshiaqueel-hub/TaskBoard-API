@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Api.Models;
 
+namespace TaskBoard.Extensions;
+
 public static class AuthExtension
 {
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app, WebApplicationBuilder builder)

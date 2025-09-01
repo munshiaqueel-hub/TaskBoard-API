@@ -1,6 +1,8 @@
 using TaskBoard.Api.Models;
 using TaskBoard.Api.Repositories;
 
+namespace TaskBoard.Extensions;
+
 public static class ColumnsExtension
 {
     public static IEndpointRouteBuilder MapColumnEndpoints(this IEndpointRouteBuilder app)
@@ -26,7 +28,7 @@ public static class ColumnsExtension
             return Results.Created($"/columns/{c.Id}", c);
         })
         .RequireAuthorization();
-        
+
         return app;
     }
 }
