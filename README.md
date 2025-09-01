@@ -1,7 +1,8 @@
 # TaskBoard-API
 TaskBoard-API
 
-Please run these commands before running app
+Please run these commands before running app:
+
 dotnet user-secrets init
 
 dotnet user-secrets set "Azure:Blob:ConnectionString" "DefaultEndpointsProtocol=https;AccountName=taskgroupstorage;AccountKey=Dfe8mdzavvMwfsgIn2zGSt4IVST4Ml+HOhf2WvkIqrHMA148/bo2GA7Kmnww8QcFNyZVQM5fHqEX+AStAWjI0w==;EndpointSuffix=core.windows.net"
