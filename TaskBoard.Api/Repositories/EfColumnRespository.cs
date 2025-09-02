@@ -21,4 +21,15 @@ public class EfColumnRepository : IColumnRepository
 
     public async Task<IReadOnlyList<Column>> GetAllAsync(CancellationToken ct)
         => await _db.Columns.ToListAsync(ct);
+
+          
+    public async Task DeleteAsync(string id, CancellationToken ct)
+    {
+        var column = await GetAsync(id, ct);
+        if (column != null)
+        {
+            _db.Columns.Remove(column);
+            await _db.SaveChangesAsync(ct);
+        }
+    }
 }

@@ -29,6 +29,15 @@ public static class ColumnsExtension
         })
         .RequireAuthorization();
 
+        app.MapDelete("/column/{id:guid}", async (IColumnRepository repo, string id, CancellationToken ct) =>
+        {
+            await repo.DeleteAsync(id, ct);
+            return Results.NoContent();
+        }).RequireAuthorization();
+
+        app.MapGet("/column/{id:guid}", async (string id, IColumnRepository repo, CancellationToken ct) => Results.Ok(await repo.GetAsync(id, ct)))
+        .RequireAuthorization();
+
         return app;
     }
 }
