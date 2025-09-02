@@ -12,5 +12,5 @@ public class BoardTask
     public Column Column { get; set; }
 
     public List<TaskImage> Images { get; set; } = new();
-    public DateTimeOffset CreatedOn { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }

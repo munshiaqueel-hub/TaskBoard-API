@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Api.Models;
 
@@ -7,8 +8,14 @@ public static class AuthExtension
 {
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app, WebApplicationBuilder builder)
     {
-        app.MapPost("/auth/register", async (RegisterRequest req, TaskBoardDbContext db, IPasswordService pwd, ITokenService tokens, CancellationToken ct) =>
+        app.MapPost("/auth/register", async (RegisterRequest req, TaskBoardDbContext db,IValidator<RegisterRequest> validator, IPasswordService pwd, ITokenService tokens, CancellationToken ct) =>
         {
+             var validationResult = await validator.ValidateAsync(req);
+
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
             if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
                 return Results.BadRequest("Email and password are required.");
 
@@ -40,8 +47,15 @@ public static class AuthExtension
         })
         .WithTags("Auth");
 
-        app.MapPost("/auth/login", async (LoginRequest req, TaskBoardDbContext db, IPasswordService pwd, ITokenService tokens, CancellationToken ct) =>
+        app.MapPost("/auth/login", async (LoginRequest req, TaskBoardDbContext db, IPasswordService pwd, ITokenService tokens,
+        IValidator<LoginRequest> validator, CancellationToken ct) =>
         {
+            var validationResult = await validator.ValidateAsync(req);
+
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
             var email = (req.Email ?? "").Trim().ToLowerInvariant();
             var user = await db.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.Email == email, ct);
             if (user is null || !pwd.Verify(user.PasswordHash, req.Password))
@@ -69,7 +83,7 @@ public static class AuthExtension
             var hash = tokens.Hash(req.RefreshToken);
 
             var token = await db.RefreshTokens.Include(rt => rt.User)
-                .FirstOrDefaultAsync(rt => rt.TokenHash == hash, ct);
+                .FirstOrDefaultAsync(rt => rt.TokenHash == hash && rt.ExpiresAt > DateTimeOffset.UtcNow, ct);
 
             if (token is null || !token.IsActive)
                 return Results.Unauthorized();

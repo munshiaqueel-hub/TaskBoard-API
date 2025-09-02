@@ -40,7 +40,6 @@ public sealed class TokenService : ITokenService
 
         // Generate a cryptographically strong refresh token (opaque) and return raw value
         var rawRefresh = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
-        var refreshExpires = now.AddDays(int.Parse(_cfg["Jwt:RefreshTokenDays"]!));
         return new TokenResponse(accessToken, accessExpires, rawRefresh);
     }
 

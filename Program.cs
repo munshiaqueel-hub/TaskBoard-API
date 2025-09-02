@@ -6,6 +6,9 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using TaskBoard.Extensions;
+using FluentValidation;
+using TaskBoard.Api.Validators;
+using TaskBoard.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,28 +65,27 @@ builder.Services.AddSwaggerGen(c =>
 // Config for Azure Blob (env vars or appsettings)
 string? blobConn = builder.Configuration["Azure:Blob:ConnectionString"];
 string? blobContainer = builder.Configuration["Azure:Blob:Container"] ?? "task-images";
-// Console.WriteLine("blobConn" + blobConn);
-// Console.WriteLine("blobContainer" + blobContainer);
 
 // DI
 // builder.Services.AddSingleton<IColumnRepository, InMemoryColumnRepository>();
 // builder.Services.AddSingleton<ITaskRepository, InMemoryTaskRepository>();
 var connstring = builder.Configuration["Azure:DB:ConnectionString"];
-Console.WriteLine("connstring: " + connstring);
 builder.Services.AddDbContext<TaskBoardDbContext>(options =>
     options.UseSqlServer(connstring));
 
 IImageStorage imageStorage = new AzureBlobImageStorage(blobConn, blobContainer);
- builder.Services.AddSingleton<IImageStorage>(imageStorage);
-// builder.Services.AddScoped<ITaskRepository, EfTaskRepository>();
-// builder.Services.AddScoped<ITaskService, TaskService>();
-// builder.Services.AddScoped<IColumnRepository, EfColumnRepository>();
-
+builder.Services.AddSingleton<IImageStorage>(imageStorage);
+builder.Services.AddScoped(typeof(IValidatorWrapper<>), typeof(ValidatorWrapper<>));
 builder.Services.AddScoped<IColumnRepository, EfColumnRepository>();
 builder.Services.AddScoped<ITaskRepository, EfTaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
+
+builder.Services.AddScoped<IValidator<IFormFileCollection>, FileCollectionValidator>();
+builder.Services.AddScoped<IValidator<ColumnsSwitchDto>, ColumnSwitchValidator>();
+builder.Services.AddScoped<IValidator<CreateTaskDto>, CreateTaskRequestValidator>();
+builder.Services.AddScoped<IValidator<EditTaskDto>, EditTaskRequestValidator>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -107,6 +109,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.FromSeconds(30)
     };
 });
+builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers()

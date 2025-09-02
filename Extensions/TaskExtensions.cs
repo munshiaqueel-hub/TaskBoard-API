@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Api.Models;
 using TaskBoard.Api.Services;
@@ -5,6 +6,18 @@ using TaskBoard.Api.Services;
 namespace TaskBoard.Extensions;
 public static class TasksExtensions
 {
+    public static async Task<IResult> Validate<T>(T dto, IValidator<T> validator)
+    {
+        var validationResult = await validator.ValidateAsync(dto);
+
+        if (!validationResult.IsValid)
+        {
+            Console.WriteLine("validationResult: " + validationResult.IsValid);
+            return Results.BadRequest(validationResult.Errors);
+        }
+        return Results.NoContent();
+    }
+
     public static IEndpointRouteBuilder MapTaskEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapGet("/tasks", async (ITaskService taskService, CancellationToken ct) =>
@@ -14,8 +27,16 @@ public static class TasksExtensions
         })
         .RequireAuthorization();
 
-        app.MapPost("/tasks", async (ITaskService taskService, [FromBody] CreateTaskDto dto, CancellationToken ct) =>
+        app.MapPost("/tasks", async (ITaskService taskService, [FromBody] CreateTaskDto dto,
+        IValidator<CreateTaskDto> validator, CancellationToken ct) =>
         {
+            var validationResult = await validator.ValidateAsync(dto);
+
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
+
             var t = await taskService.CreateAsync(dto, ct);
             var taskDto = new TaskDto(t.Id, t.Name, t.Description, t.Deadline, t.ColumnId, t.IsFavorite);
             return Results.Created($"/tasks/{t.Id}", taskDto);
@@ -28,8 +49,15 @@ public static class TasksExtensions
             .RequireAuthorization();
 
 
-        app.MapPut("/tasks/{id:guid}", async (ITaskService taskService, Guid id, EditTaskDto dto, CancellationToken ct) =>
+        app.MapPut("/tasks/{id:guid}", async (ITaskService taskService, Guid id, EditTaskDto dto,
+        IValidator<EditTaskDto> validator, CancellationToken ct) =>
         {
+            var validationResult = await validator.ValidateAsync(dto);
+
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
             await taskService.EditAsync(new TaskId(id), dto, ct);
             return Results.NoContent();
         }).RequireAuthorization();
@@ -42,8 +70,14 @@ public static class TasksExtensions
         }).RequireAuthorization();
 
 
-        app.MapPost("/tasks/columnswitch", async ([FromBody] ColumnsSwitchDto columnsSwitchDto, ITaskService taskService, CancellationToken ct) =>
+        app.MapPost("/tasks/columnswitch", async ([FromBody] ColumnsSwitchDto columnsSwitchDto,IValidator<ColumnsSwitchDto> validator, ITaskService taskService, CancellationToken ct) =>
         {
+            var validationResult = await validator.ValidateAsync(columnsSwitchDto);
+
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors);
+            }
             await taskService.MoveAsync(new TaskId(columnsSwitchDto.Id), columnsSwitchDto.ColumnId.ToString(), ct);
             return Results.NoContent();
         }).RequireAuthorization();
@@ -64,9 +98,17 @@ public static class TasksExtensions
         //     var url = await taskService.AttachImageAsync(new TaskId(id), file.FileName, stream, file.ContentType, ct);
         //     return Results.Ok(new { Url = url });
         // });
+
         app.MapPost("/tasks/{id:guid}/images",
-            async (Guid id, IFormFileCollection files, ITaskService taskService, CancellationToken ct) =>
+            async (Guid id, IFormFileCollection files, ITaskService taskService, IValidator<IFormFileCollection> validator, CancellationToken ct) =>
             {
+                 var validationResult = await validator.ValidateAsync(files);
+
+                if (!validationResult.IsValid)
+                {
+                    return Results.BadRequest(validationResult.Errors);
+                }
+
                 if (files == null || files.Count == 0)
                     return Results.BadRequest("At least one file is required");
 
@@ -80,6 +122,7 @@ public static class TasksExtensions
             .Produces(StatusCodes.Status400BadRequest)
             .DisableAntiforgery()
         .RequireAuthorization();
+        
         return app;
     }
 }

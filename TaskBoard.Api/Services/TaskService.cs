@@ -27,7 +27,7 @@ public sealed class TaskService : ITaskService
             Deadline = createTaskDto.Deadline,
             ColumnId = column.Id,
             IsFavorite = createTaskDto.IsFavorite,
-            CreatedOn = DateTimeOffset.UtcNow
+            CreatedAt = DateTimeOffset.UtcNow
         };
         await _tasks.AddAsync(task, ct);
         return task;
