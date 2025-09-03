@@ -42,6 +42,33 @@ namespace TaskBoard.Tests.Services
             _taskRepo.Verify(r => r.AddAsync(It.IsAny<BoardTask>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
+            [Test]
+        public async Task GetColumnTasksSortedAsync_ShouldSortByFavoriteThenName()
+        {
+            // Arrange
+            var columnId = Guid.NewGuid();
+            var ct = CancellationToken.None;
+
+            var taskList = new List<BoardTask>
+            {
+                new BoardTask { Id = Guid.NewGuid(), Name = "Beta", IsFavorite = false },
+                new BoardTask { Id = Guid.NewGuid(), Name = "alpha", IsFavorite = false },
+                new BoardTask { Id = Guid.NewGuid(), Name = "gamma", IsFavorite = true },
+            };
+
+            _taskRepo.Setup(r => r.GetByColumnAsync(columnId, ct))
+                    .ReturnsAsync(taskList);
+
+            // Act
+            var result = await _service.GetColumnTasksSortedAsync(columnId, ct);
+
+            // Assert
+            Assert.That(result.Count, Is.EqualTo(3));
+            Assert.That(result[0].Name, Is.EqualTo("gamma")); // favorite should come first
+            Assert.That(result[1].Name, Is.EqualTo("alpha")); // then sorted alphabetically
+            Assert.That(result[2].Name, Is.EqualTo("Beta"));
+        }
+
         [Test]
         public void CreateAsync_ShouldThrow_WhenNameMissing()
         {
