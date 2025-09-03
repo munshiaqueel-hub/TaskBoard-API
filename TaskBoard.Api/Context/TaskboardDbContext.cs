@@ -37,6 +37,24 @@ public class TaskBoardDbContext : DbContext
         modelBuilder.Entity<RefreshToken>()
             .HasIndex(rt => new { rt.UserId, rt.TokenHash })
             .IsUnique();
+
+        // Column -> Tasks (1:N)
+        modelBuilder.Entity<Column>()
+            .HasMany(c => c.Tasks)
+            .WithOne(t => t.Column)
+            .HasForeignKey(t => t.ColumnId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Task -> Images (1:N)
+        modelBuilder.Entity<BoardTask>()
+            .HasMany(t => t.Images)
+            .WithOne(i => i.Task)
+            .HasForeignKey(i => i.TaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        modelBuilder.Entity<Column>()
+            .HasIndex(c => c.Name)
+            .IsUnique();
     }
 
 }
