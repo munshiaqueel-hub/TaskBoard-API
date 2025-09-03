@@ -1,9 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using TaskBoard.Api.Models;
 using TaskBoard.Api.Repositories;
 
@@ -44,7 +40,7 @@ namespace TaskBoard.Tests.Repositories
                 Name = "Task 1",
                 Description = "Test",
                 ColumnId = Guid.NewGuid(),
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedOn = DateTimeOffset.UtcNow
             };
 
             await _repo.AddAsync(task, _ct);
@@ -63,7 +59,7 @@ namespace TaskBoard.Tests.Repositories
                 Name = "Old Name",
                 Description = "Old",
                 ColumnId = Guid.NewGuid(),
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedOn = DateTimeOffset.UtcNow
             };
             await _repo.AddAsync(task, _ct);
 
@@ -82,7 +78,7 @@ namespace TaskBoard.Tests.Repositories
                 Id = Guid.NewGuid(),
                 Name = "Delete Me",
                 ColumnId = Guid.NewGuid(),
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedOn = DateTimeOffset.UtcNow
             };
             await _repo.AddAsync(task, _ct);
 
@@ -95,8 +91,8 @@ namespace TaskBoard.Tests.Repositories
         [Test]
         public async Task GetAllAsync_ShouldReturnAllTasks()
         {
-            var t1 = new BoardTask { Id = Guid.NewGuid(), Name = "T1", ColumnId = Guid.NewGuid(), CreatedAt = DateTimeOffset.UtcNow };
-            var t2 = new BoardTask { Id = Guid.NewGuid(), Name = "T2", ColumnId = Guid.NewGuid(), CreatedAt = DateTimeOffset.UtcNow };
+            var t1 = new BoardTask { Id = Guid.NewGuid(), Name = "T1", ColumnId = Guid.NewGuid(), CreatedOn = DateTimeOffset.UtcNow };
+            var t2 = new BoardTask { Id = Guid.NewGuid(), Name = "T2", ColumnId = Guid.NewGuid(), CreatedOn = DateTimeOffset.UtcNow };
 
             await _repo.AddAsync(t1, _ct);
             await _repo.AddAsync(t2, _ct);
@@ -109,8 +105,8 @@ namespace TaskBoard.Tests.Repositories
         public async Task GetByColumnAsync_ShouldReturnFilteredTasks()
         {
             var columnId = Guid.NewGuid();
-            var t1 = new BoardTask { Id = Guid.NewGuid(), Name = "In column", ColumnId = columnId, CreatedAt = DateTimeOffset.UtcNow };
-            var t2 = new BoardTask { Id = Guid.NewGuid(), Name = "Other column", ColumnId = Guid.NewGuid(), CreatedAt = DateTimeOffset.UtcNow };
+            var t1 = new BoardTask { Id = Guid.NewGuid(), Name = "In column", ColumnId = columnId, CreatedOn = DateTimeOffset.UtcNow };
+            var t2 = new BoardTask { Id = Guid.NewGuid(), Name = "Other column", ColumnId = Guid.NewGuid(), CreatedOn = DateTimeOffset.UtcNow };
 
             await _repo.AddAsync(t1, _ct);
             await _repo.AddAsync(t2, _ct);

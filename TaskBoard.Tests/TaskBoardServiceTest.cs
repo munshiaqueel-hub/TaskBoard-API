@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Moq;
 using NUnit.Framework;
 using TaskBoard.Api.Models;
@@ -72,7 +73,7 @@ namespace TaskBoard.Tests.Services
             _taskRepo.Setup(r => r.GetAsync(id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(task);
 
-            var dto = new EditTaskDto("New Name", null, null, false);
+            var dto = new EditTaskDto("New Name", null, null, null, false);
 
             await _service.EditAsync(id, dto, CancellationToken.None);
 
@@ -156,7 +157,7 @@ namespace TaskBoard.Tests.Services
             _taskRepo.Setup(r => r.GetAsync(id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((BoardTask?)null);
 
-            var dto = new EditTaskDto("Name", null, null, false);
+            var dto = new EditTaskDto("Name", null, null, null, false);
 
             Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _service.EditAsync(id, dto, CancellationToken.None));

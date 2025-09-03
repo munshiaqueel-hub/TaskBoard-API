@@ -65,7 +65,8 @@ builder.Services.AddSwaggerGen(c =>
 // Config for Azure Blob (env vars or appsettings)
 string? blobConn = builder.Configuration["Azure:Blob:ConnectionString"];
 string? blobContainer = builder.Configuration["Azure:Blob:Container"] ?? "task-images";
-
+Console.WriteLine("blobConn:  " + blobConn);
+Console.WriteLine("blobContainer : " + blobContainer);
 // DI
 // builder.Services.AddSingleton<IColumnRepository, InMemoryColumnRepository>();
 // builder.Services.AddSingleton<ITaskRepository, InMemoryTaskRepository>();
@@ -79,13 +80,17 @@ builder.Services.AddScoped(typeof(IValidatorWrapper<>), typeof(ValidatorWrapper<
 builder.Services.AddScoped<IColumnRepository, EfColumnRepository>();
 builder.Services.AddScoped<ITaskRepository, EfTaskRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IColumnService, ColumnService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IPasswordService, PasswordService>();
 
+//Validators
 builder.Services.AddScoped<IValidator<IFormFileCollection>, FileCollectionValidator>();
 builder.Services.AddScoped<IValidator<ColumnsSwitchDto>, ColumnSwitchValidator>();
 builder.Services.AddScoped<IValidator<CreateTaskDto>, CreateTaskRequestValidator>();
 builder.Services.AddScoped<IValidator<EditTaskDto>, EditTaskRequestValidator>();
+builder.Services.AddScoped<IValidator<CreateColumnDto>, AddColumnRequestValidator>();
+
 
 builder.Services.AddAuthentication(options =>
 {

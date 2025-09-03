@@ -10,7 +10,7 @@ public sealed class TokenService : ITokenService
 
     public TokenService(IConfiguration cfg) => _cfg = cfg;
 
-    TokenResponse ITokenService.CreateTokens(AppUser user)
+    public TokenResponse CreateTokens(AppUser user)
     {
         var issuer = _cfg["Jwt:Issuer"];
         var audience = _cfg["Jwt:Audience"];

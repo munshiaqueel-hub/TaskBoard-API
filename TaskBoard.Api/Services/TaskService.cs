@@ -27,7 +27,7 @@ public sealed class TaskService : ITaskService
             Deadline = createTaskDto.Deadline,
             ColumnId = column.Id,
             IsFavorite = createTaskDto.IsFavorite,
-            CreatedAt = DateTimeOffset.UtcNow
+            CreatedOn = DateTimeOffset.UtcNow
         };
         await _tasks.AddAsync(task, ct);
         return task;
@@ -40,10 +40,15 @@ public sealed class TaskService : ITaskService
     public async Task EditAsync(TaskId id, EditTaskDto editTaskDto, CancellationToken ct)
     {
         var task = await _tasks.GetAsync(id, ct) ?? throw new InvalidOperationException("Task not found");
-        task.Name = string.IsNullOrWhiteSpace(editTaskDto.Name) ? task.Name : editTaskDto.Name.Trim();
+        var column = !string.IsNullOrWhiteSpace(editTaskDto.ColumnId) ? await _columns.GetAsync(editTaskDto.ColumnId, ct) ?? throw new InvalidOperationException("Column not found") : null;
+        task.Name = editTaskDto.Name.Trim();
         task.Description = editTaskDto.Description?.Trim();
         task.Deadline = editTaskDto.Deadline;
         task.IsFavorite = editTaskDto.IsFavorite;
+        if (column != null)
+        {
+            task.ColumnId = column.Id;
+        }
         await _tasks.UpdateAsync(task, ct);
     }
 
