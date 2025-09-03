@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using Swashbuckle.AspNetCore.Annotations;
-
 namespace TaskBoard.Api.Models;
 
 // public sealed record ColumnId(Guid Value)
@@ -20,4 +17,8 @@ public class Column
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public List<BoardTask> Tasks { get; set; } = new();
+    public bool IsDeleted { get; set; } = false;
+    public DateTimeOffset? DeletedOn { get; set; }
+    // New column
+    public bool IsArchived { get; set; } = false;
 }

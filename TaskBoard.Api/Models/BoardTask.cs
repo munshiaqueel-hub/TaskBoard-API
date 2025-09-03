@@ -13,4 +13,10 @@ public class BoardTask
 
     public List<TaskImage> Images { get; set; } = new();
     public DateTimeOffset CreatedOn { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
+    public DateTimeOffset? DeletedOn { get; set; }
+
+    // New column
+    public bool IsArchived { get; set; } = false;
 }

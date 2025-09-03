@@ -2,12 +2,16 @@ using FluentValidation;
 
 public class FileCollectionValidator : AbstractValidator<IFormFileCollection>
 {
-     private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".pdf" }; // allowed types
+    private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".pdf" }; // allowed types
     private const long _maxFileSize = 5 * 1024 * 1024; // 5 MB
+    private const int MaxFilesAllowed = 5; // set your max limit
+
     public FileCollectionValidator()
     {
         RuleFor(x => x)
-            .NotEmpty().WithMessage("At least one file is required!");
+            .NotEmpty().WithMessage("At least one file is required!")
+            .Must(files => files.Count <= MaxFilesAllowed)
+            .WithMessage($"A maximum of {MaxFilesAllowed} files can be uploaded.");
 
         RuleForEach(x => x).ChildRules(file =>
         {

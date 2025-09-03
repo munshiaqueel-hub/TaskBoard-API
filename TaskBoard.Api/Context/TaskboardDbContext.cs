@@ -21,7 +21,7 @@ public class TaskBoardDbContext : DbContext
             entity.HasOne(ti => ti.Task)
                   .WithMany(t => t.Images)
                   .HasForeignKey(ti => ti.TaskId)
-                  .OnDelete(DeleteBehavior.Cascade); // or DeleteBehavior.Restrict if you don’t want cascade
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<AppUser>()
